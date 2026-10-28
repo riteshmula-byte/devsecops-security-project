@@ -1,0 +1,44 @@
+
+name: "Task 4 - Container Security Scan (Trivy)"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  container-scan:
+    name: Build and scan Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t devsecops-lab:local .
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-lab:local
+          format: table
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH,MEDIUM
+
+      - name: Scan repository configuration
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: misconfig
+          format: table
+          exit-code: '0'
+          severity: CRITICAL,HIGH,MEDIUM

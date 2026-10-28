@@ -1,0 +1,44 @@
+﻿name: "Task 5 - Security Gates"
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-gate:
+    name: Security Gate Passed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify security workflow files exist
+        shell: bash
+        run: |
+          set -e
+          required_files=(
+            ".github/workflows/task-3-codeql-sast.yml"
+            ".github/workflows/task-4-sast-semgrep.yml"
+            ".github/workflows/task-4-sca-dependency-scan.yml"
+            ".github/workflows/task-4-secret-scan-gitleaks.yml"
+            ".github/workflows/task-4-iac-scan-checkov.yml"
+            ".github/workflows/task-4-container-scan-trivy.yml"
+          )
+
+          missing=0
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "FOUND: $file"
+            else
+              echo "MISSING: $file"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "Security gate failed: required scanner workflow files are missing."
+            exit 1
+          fi
+
+          echo "Security gate passed: required scanner workflow files exist."
