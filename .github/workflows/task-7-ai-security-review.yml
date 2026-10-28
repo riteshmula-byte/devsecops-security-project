@@ -1,0 +1,23 @@
+
+name: "Task 7 - AI-Powered PR Review"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v4
+
+      - name: AI review integration placeholder
+        run: |
+          echo "AI-powered PR review is optional."
+          echo "Configure a supported AI review provider and its repository secret here."
